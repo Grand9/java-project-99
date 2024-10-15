@@ -24,17 +24,17 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./app/gradlew
 
-      - name: Build with Gradle
+      - name: Build and run with Makefile
         working-directory: ./app
-        run: ./gradlew build
+        run: make build-run
 
-      - name: Run tests with Gradle
+      - name: Run tests with Makefile
         working-directory: ./app
-        run: ./gradlew test
+        run: make test
 
       - name: Generate JaCoCo report
         working-directory: ./app
-        run: ./gradlew jacocoTestReport
+        run: make report
 
       - name: Publish code coverage
         if: ${{ github.event_name == 'push' }}
