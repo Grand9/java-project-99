@@ -24,17 +24,17 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./app/gradlew
 
-      - name: Build and run with Makefile
+      - name: Build with Gradle
         working-directory: ./app
-        run: make build-run
+        run: ./gradlew build
 
-      - name: Run tests with Makefile
+      - name: Run tests with Gradle
         working-directory: ./app
-        run: make test
+        run: ./gradlew test
 
       - name: Generate JaCoCo report
         working-directory: ./app
-        run: make report
+        run: ./gradlew jacocoTestReport
 
       - name: Publish code coverage
         if: ${{ github.event_name == 'push' }}
@@ -46,3 +46,7 @@ jobs:
           coverageCommand: make report
           debug: true
           coverageLocations: ${{github.workspace}}/app/build/reports/jacoco/test/jacocoTestReport.xml
+
+      - name: Run the application
+        working-directory: ./app
+        run: make run
