@@ -4,11 +4,15 @@ plugins {
 	id("io.spring.dependency-management") version "1.1.6"
 	id("jacoco")
 	checkstyle
+	application
 }
 
 group = "hexlet.code"
 version = "0.0.1-SNAPSHOT"
 
+application {
+	val mainClass: String? = "hexlet.code.AppApplication"
+}
 java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)

@@ -4,6 +4,10 @@ WORKDIR /app
 
 COPY . .
 
+RUN ls -la /app
+
+RUN gradle tasks
+
 RUN gradle installDist
 
 FROM eclipse-temurin:21-jdk
