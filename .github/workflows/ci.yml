@@ -18,8 +18,12 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: 8.5
-      - run: make build-run
+      - name: Run Makefile
+        run: |
+          cd app
+          make build-run
       - run: make lint
+      - run: make test
       - run: make test
 
       - name: Publish code coverage
