@@ -1,36 +1,42 @@
 name: Build
 
 on:
-  - push
-  - pull_request
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up JDK
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: 8.5
-      - name: Run Makefile
-        run: |
-          cd app
-          make build-run
-      - run: make lint
-      - run: make test
-      - run: make test
 
-      - name: Publish code coverage
+      - name: Build with Gradle
+        run: ./gradlew clean build
+
+      - name: Run Lint Checks
+        run: ./gradlew checkstyleMain checkstyleTest
+
+      - name: Run Tests
+        run: ./gradlew test
+
+      - name: Generate Code Coverage Report
+        run: ./gradlew jacocoTestReport
+
+      - name: Publish Code Coverage
         uses: paambaati/codeclimate-action@v3.1.1
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
           JACOCO_SOURCE_PATH: src/main/java
         with:
           coverageCommand: ./gradlew jacocoTestReport
-          coverageLocations: ${{ github.workspace }}/app/build/reports/jacoco/test/jacocoTestReport.xml:jacoco
+          coverageLocations: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml:jacoco
