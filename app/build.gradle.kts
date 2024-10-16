@@ -15,18 +15,6 @@ java {
 	}
 }
 
-jacoco {
-	toolVersion = "0.8.10"
-}
-
-tasks.jacocoTestReport {
-	dependsOn(tasks.test)
-	reports {
-		xml.required.set(true)
-		html.required.set(true)
-	}
-}
-
 configurations {
 	compileOnly {
 		extendsFrom(configurations.annotationProcessor.get())
@@ -52,7 +40,15 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-tasks.withType<Test> {
+tasks.test {
 	useJUnitPlatform()
 	finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+	dependsOn(tasks.test)
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+	}
 }
