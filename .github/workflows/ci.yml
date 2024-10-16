@@ -42,7 +42,7 @@ jobs:
           coverageCommand: make -C ./app report
 
       - name: Upload JaCoCo report
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: jacoco-report
           path: app/build/reports/jacoco/test/html/
