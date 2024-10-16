@@ -11,8 +11,9 @@ group = "hexlet.code"
 version = "0.0.1-SNAPSHOT"
 
 application {
-	val mainClass: String? = "hexlet.code.AppApplication"
+	mainClass.set("hexlet.code.AppApplication")
 }
+
 java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
