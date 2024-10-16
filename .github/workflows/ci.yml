@@ -1,12 +1,8 @@
 name: Build
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  - push
+  - pull_request
 
 jobs:
   build:
@@ -18,15 +14,11 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: 8.5
-      - run: make build
+      - run: make build-run
       - run: make lint
       - run: make test
 
