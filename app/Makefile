@@ -7,10 +7,10 @@ clean:
 	./gradlew clean
 
 build:
-	./gradlew clean build
+	./gradlew build
 
 install:
-	./gradlew clean install
+	./gradlew install
 
 run-dist:
 	./build/install/app/bin/app
@@ -22,7 +22,7 @@ test:
 	./gradlew test
 
 report:
-	./gradlew -p app jacocoTestReport
+	./gradlew jacocoTestReport
 
 lint:
 	./gradlew checkstyleMain
