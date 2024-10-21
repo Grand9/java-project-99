@@ -1,13 +1,14 @@
-.gradle
+# Gradle
+.gradle/
 build/
-.idea/
-jte-classes
+**/build/
+**/out/
 jte-classes/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### STS ###
+# STS (Spring Tool Suite)
 .apt_generated
 .classpath
 .factorypath
@@ -19,8 +20,8 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
-### IntelliJ IDEA ###
-.idea
+# IntelliJ IDEA
+.idea/
 *.iws
 *.iml
 *.ipr
@@ -28,12 +29,39 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
-### NetBeans ###
+# NetBeans
 /nbproject/private/
 /nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+dist/
+nbdist/
+.nb-gradle/
 
-### VS Code ###
+# VS Code
 .vscode/
+
+# Eclipse
+.metadata/
+.bin/
+.buildpath
+.target/
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*.DS_Store
+*.db
+*.sql
+*.zip
+*.tar.gz
+*.tgz
+
+# Miscellaneous
+*.lock
+*.egg-info/
