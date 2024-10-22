@@ -30,7 +30,7 @@ public class AppConfig {
     CommandLineRunner initDatabase(UserRepository userRepository, PasswordEncoder passwordEncoder, Environment env) {
         return args -> {
             if (Arrays.asList(env.getActiveProfiles()).contains("dev")
-                    && userRepository.findByEmail("hexlet@example.com") == null) {
+                    && userRepository.findByEmail("hexlet@example.com").isEmpty()) {
                 User adminUser = new User();
                 adminUser.setEmail("hexlet@example.com");
                 adminUser.setPassword(passwordEncoder.encode("qwerty"));
@@ -38,4 +38,5 @@ public class AppConfig {
             }
         };
     }
+
 }

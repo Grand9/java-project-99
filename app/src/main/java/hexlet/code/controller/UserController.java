@@ -6,19 +6,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import jakarta.validation.Valid;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -42,8 +42,8 @@ public class UserController {
     /**
      * Creates a new user.
      *
-     * @param user The user object to be created.
-     * @return ResponseEntity containing the created user.
+     * @param user the user to be created
+     * @return ResponseEntity containing the created user
      */
     @PostMapping
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
@@ -54,8 +54,8 @@ public class UserController {
     /**
      * Retrieves a user by ID.
      *
-     * @param id The ID of the user to retrieve.
-     * @return ResponseEntity containing the user if found, or not found status.
+     * @param id the ID of the user
+     * @return ResponseEntity containing the user or 404 if not found
      */
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(@PathVariable Long id) {
@@ -65,11 +65,11 @@ public class UserController {
     }
 
     /**
-     * Updates an existing user.
+     * Updates a user.
      *
-     * @param id The ID of the user to update.
-     * @param updatedUser The updated user object.
-     * @return ResponseEntity containing the updated user.
+     * @param id           the ID of the user to update
+     * @param updatedUser  the updated user data
+     * @return ResponseEntity containing the updated user
      */
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @Valid @RequestBody User updatedUser) {
@@ -79,8 +79,8 @@ public class UserController {
     /**
      * Deletes a user by ID.
      *
-     * @param id The ID of the user to delete.
-     * @return ResponseEntity with no content.
+     * @param id the ID of the user to delete
+     * @return ResponseEntity with no content
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
@@ -91,7 +91,7 @@ public class UserController {
     /**
      * Retrieves all users.
      *
-     * @return List of all users.
+     * @return List of all users
      */
     @GetMapping
     public List<User> getAllUsers() {
@@ -101,16 +101,15 @@ public class UserController {
     /**
      * Handles validation exceptions.
      *
-     * @param ex The validation exception.
-     * @return ResponseEntity containing a map of field errors.
+     * @param ex the validation exception
+     * @return ResponseEntity with validation errors
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(error -> {
-            errors.put(error.getField(), error.getDefaultMessage());
-        });
+        ex.getBindingResult().getFieldErrors().forEach(error -> errors.put(error.getField(),
+                error.getDefaultMessage()));
         return ResponseEntity.badRequest().body(errors);
     }
 }

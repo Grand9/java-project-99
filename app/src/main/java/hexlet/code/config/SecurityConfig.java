@@ -17,7 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 @Configuration
 @EnableWebSecurity
-public final class SecurityConfig {
+public class SecurityConfig {
 
     @Autowired
     @Lazy

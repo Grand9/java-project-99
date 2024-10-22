@@ -32,8 +32,8 @@ public class UserControllerTest {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     /**
-     * Setup method for initializing test data.
-     * This method should be overridden by subclasses for custom setup.
+     * Sets up the test environment before each test.
+     * Initializes MockMvc and clears the user repository.
      */
     @BeforeEach
     void setup() {
