@@ -17,12 +17,19 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public final class SecurityConfig {
 
     @Autowired
     @Lazy
     private UserDetailsService userDetailsService;
 
+    /**
+     * Configures the security filter chain.
+     *
+     * @param http The HttpSecurity object to be configured.
+     * @return The configured SecurityFilterChain.
+     * @throws Exception If an error occurs during configuration.
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -35,16 +42,33 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Provides a password encoder.
+     *
+     * @return A PasswordEncoder instance.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Provides a JWT authentication filter.
+     *
+     * @return A JwtAuthenticationFilter instance.
+     */
     @Bean
     public Filter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter(userDetailsService);
     }
 
+    /**
+     * Configures the authentication manager.
+     *
+     * @param http The HttpSecurity object.
+     * @return The configured AuthenticationManager.
+     * @throws Exception If an error occurs during configuration.
+     */
     @Bean
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder =

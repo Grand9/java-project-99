@@ -17,6 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+
 @SpringBootTest
 @AutoConfigureMockMvc
 public class UserControllerTest {
@@ -30,6 +31,10 @@ public class UserControllerTest {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * Setup method for initializing test data.
+     * This method should be overridden by subclasses for custom setup.
+     */
     @BeforeEach
     void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();

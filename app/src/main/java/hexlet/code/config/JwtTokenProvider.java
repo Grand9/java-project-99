@@ -15,7 +15,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 @Component
-public class JwtTokenProvider {
+public final class JwtTokenProvider {
 
     private final PrivateKey privateKey;
     private final PublicKey publicKey;
@@ -30,7 +30,7 @@ public class JwtTokenProvider {
         String key = new String(Files.readAllBytes(Paths.get(path)));
         key = key.replace("-----BEGIN PRIVATE KEY-----", "")
                 .replace("-----END PRIVATE KEY-----", "")
-                .replaceAll("\\s+", ""); // Удаляем все пробелы и переносы строк
+                .replaceAll("\\s+", "");
         byte[] keyBytes = Base64.getDecoder().decode(key);
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -41,14 +41,19 @@ public class JwtTokenProvider {
         String key = new String(Files.readAllBytes(Paths.get(path)));
         key = key.replace("-----BEGIN PUBLIC KEY-----", "")
                 .replace("-----END PUBLIC KEY-----", "")
-                .replaceAll("\\s+", ""); // Удаляем все пробелы и переносы строк
+                .replaceAll("\\s+", "");
         byte[] keyBytes = Base64.getDecoder().decode(key);
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         return keyFactory.generatePublic(keySpec);
     }
 
-
+    /**
+     * Generates a JWT token for the given username.
+     *
+     * @param username The username for which the token is generated.
+     * @return A JWT token as a string.
+     */
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
@@ -56,6 +61,13 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    /**
+     * Validates the given JWT token.
+     *
+     * @param token The JWT token to validate.
+     * @return The username extracted from the token if valid.
+     * @throws io.jsonwebtoken.SignatureException if the token signature is invalid.
+     */
     public String validateToken(String token) {
         return Jwts.parser()
                 .setSigningKey(publicKey)

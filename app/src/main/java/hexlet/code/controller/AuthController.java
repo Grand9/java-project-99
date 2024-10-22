@@ -26,6 +26,12 @@ public class AuthController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+    /**
+     * Authenticates a user and returns a JWT token.
+     *
+     * @param authRequest The authentication request containing email and password.
+     * @return ResponseEntity containing the JWT token or an error message.
+     */
     @PostMapping("/api/login")
     public ResponseEntity<String> login(@RequestBody AuthRequest authRequest) {
         try {
