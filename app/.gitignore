@@ -1,3 +1,11 @@
+# Ignoring environment variables
+.env
+
+# Ignoring keys
+*.key
+*.jks
+*.p12
+
 # Gradle
 .gradle/
 build/

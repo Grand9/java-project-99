@@ -1,11 +1,13 @@
 spring:
-  profiles: dev
   datasource:
-    url: jdbc:h2:mem:mydb
-    username: sa
-    password: 123
+    url: jdbc:h2:mem:testdb;DB_CLOSE_ON_EXIT=FALSE
     driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
 
-h2:
-  console:
-    enabled: true
+logging:
+  level:
+    org.springframework: DEBUG

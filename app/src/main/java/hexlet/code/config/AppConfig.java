@@ -5,7 +5,10 @@ import hexlet.code.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Arrays;
 
 /**
  * Configuration class for application settings.
@@ -20,15 +23,20 @@ public class AppConfig {
      *
      * @param userRepository the user repository for database operations.
      * @param passwordEncoder the password encoder used for hashing passwords.
+     * @param env the environment object to access the active profiles.
      * @return CommandLineRunner that initializes the database.
      */
     @Bean
-    CommandLineRunner initDatabase(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    CommandLineRunner initDatabase(UserRepository userRepository, PasswordEncoder passwordEncoder, Environment env) {
         return args -> {
-            User adminUser = new User();
-            adminUser.setEmail("hexlet@example.com");
-            adminUser.setPassword(passwordEncoder.encode("qwerty"));
-            userRepository.save(adminUser);
+            if (Arrays.asList(env.getActiveProfiles()).contains("dev") &&
+                    userRepository.findByEmail("hexlet@example.com") == null) {
+                User adminUser = new User();
+                adminUser.setEmail("hexlet@example.com");
+                adminUser.setPassword(passwordEncoder.encode("qwerty"));
+                userRepository.save(adminUser);
+            }
         };
     }
+
 }
