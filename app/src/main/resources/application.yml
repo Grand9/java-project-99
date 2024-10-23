@@ -1,10 +1,15 @@
 spring:
+  application:
+    name: app
+  datasource:
+    url: jdbc:h2:file:/home/grand/java-project-99/app/db/testdb;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: update
-  datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_ON_EXIT=FALSE
   h2:
     console:
       enabled: true
@@ -12,3 +17,10 @@ spring:
       settings:
         web:
           enable-basic-auth: true
+jwt:
+  private:
+    key:
+      path: src/main/resources/certs/private_key.pem
+  public:
+    key:
+      path: src/main/resources/certs/public_key.pem
