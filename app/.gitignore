@@ -1,3 +1,15 @@
+# Ignore H2 database files
+/app/db/testdb.mv.db
+/app/db/testdb.trace.db
+
+# Ignore Spring configuration files
+application.properties
+application-dev.yml
+application-prod.yml
+application.yml
+
+# Ignore any other sensitive files
+
 # Ignoring environment variables
 .env
 
