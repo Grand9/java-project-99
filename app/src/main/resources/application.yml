@@ -18,10 +18,10 @@ jwt:
   secret: your_jwt_secret_key
   private:
     key:
-      path: src/main/resources/certs/private_key.pem
+      path: classpath:certs/private_key.pem
   public:
     key:
-      path: src/main/resources/certs/public_key.pem
+      path: classpath:certs/public_key.pem
 
 logging:
   level:
