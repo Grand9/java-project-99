@@ -3,6 +3,7 @@ package hexlet.code;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 public class UserControllerTest {
 
     private MockMvc mockMvc;

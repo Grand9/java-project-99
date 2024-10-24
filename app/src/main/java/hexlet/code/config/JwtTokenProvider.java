@@ -30,7 +30,7 @@ public class JwtTokenProvider {
         String key = new String(Files.readAllBytes(Paths.get(path)));
         key = key.replace("-----BEGIN PRIVATE KEY-----", "")
                 .replace("-----END PRIVATE KEY-----", "")
-                .replaceAll("\\s+", ""); // Удаляем все пробелы и переносы строк
+                .replaceAll("\\s+", "");
         byte[] keyBytes = Base64.getDecoder().decode(key);
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -41,7 +41,7 @@ public class JwtTokenProvider {
         String key = new String(Files.readAllBytes(Paths.get(path)));
         key = key.replace("-----BEGIN PUBLIC KEY-----", "")
                 .replace("-----END PUBLIC KEY-----", "")
-                .replaceAll("\\s+", ""); // Удаляем все пробелы и переносы строк
+                .replaceAll("\\s+", "");
         byte[] keyBytes = Base64.getDecoder().decode(key);
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
