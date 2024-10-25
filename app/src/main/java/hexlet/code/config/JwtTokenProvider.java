@@ -2,11 +2,11 @@ package hexlet.code.config;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.Getter;
 import org.springframework.stereotype.Component;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -14,20 +14,26 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
+@Getter
 @Component
 public class JwtTokenProvider {
 
-    private final PrivateKey privateKey;
-    private final PublicKey publicKey;
+    private final String privateKeyPath = "certs/private_key.pem";
+    private final String publicKeyPath = "certs/public_key.pem";
+    private PrivateKey privateKey;
+    private PublicKey publicKey;
 
-    public JwtTokenProvider(@Value("${jwt.private.key.path}") String privateKeyPath,
-                            @Value("${jwt.public.key.path}") String publicKeyPath) throws Exception {
+    public JwtTokenProvider() throws Exception {
         this.privateKey = loadPrivateKey(privateKeyPath);
         this.publicKey = loadPublicKey(publicKeyPath);
     }
 
     private PrivateKey loadPrivateKey(String path) throws Exception {
-        String key = new String(Files.readAllBytes(Paths.get(path)));
+        InputStream keyStream = getClass().getClassLoader().getResourceAsStream(path);
+        if (keyStream == null) {
+            throw new FileNotFoundException("Key file not found: " + path);
+        }
+        String key = new String(keyStream.readAllBytes());
         key = key.replace("-----BEGIN PRIVATE KEY-----", "")
                 .replace("-----END PRIVATE KEY-----", "")
                 .replaceAll("\\s+", "");
@@ -38,7 +44,11 @@ public class JwtTokenProvider {
     }
 
     private PublicKey loadPublicKey(String path) throws Exception {
-        String key = new String(Files.readAllBytes(Paths.get(path)));
+        InputStream keyStream = getClass().getClassLoader().getResourceAsStream(path);
+        if (keyStream == null) {
+            throw new FileNotFoundException("Key file not found: " + path);
+        }
+        String key = new String(keyStream.readAllBytes());
         key = key.replace("-----BEGIN PUBLIC KEY-----", "")
                 .replace("-----END PUBLIC KEY-----", "")
                 .replaceAll("\\s+", "");
@@ -51,8 +61,8 @@ public class JwtTokenProvider {
     /**
      * Generates a JWT token for the given username.
      *
-     * @param username The username for which the token is generated.
-     * @return A JWT token as a string.
+     * @param username the username for which the token is generated
+     * @return the generated JWT token
      */
     public String generateToken(String username) {
         return Jwts.builder()
@@ -62,11 +72,11 @@ public class JwtTokenProvider {
     }
 
     /**
-     * Validates the given JWT token.
+     * Validates the given JWT token and returns the subject.
      *
-     * @param token The JWT token to validate.
-     * @return The username extracted from the token if valid.
-     * @throws io.jsonwebtoken.SignatureException if the token signature is invalid.
+     * @param token the JWT token to validate
+     * @return the subject of the token
+     * @throws IllegalArgumentException if the token is invalid
      */
     public String validateToken(String token) {
         return Jwts.parser()

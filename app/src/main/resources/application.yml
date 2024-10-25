@@ -15,13 +15,13 @@ spring:
       enabled: true
 
 jwt:
-  secret: your_jwt_secret_key
+  secret: Ox8Fo+GPG4nM0Z+CvmV+EYfzz+rOVAkvtiq8YRSvVvk=
   private:
     key:
-      path: classpath:certs/private_key.pem
+      path: certs/private_key.pem
   public:
     key:
-      path: classpath:certs/public_key.pem
+      path: certs/public_key.pem
 
 logging:
   level:
