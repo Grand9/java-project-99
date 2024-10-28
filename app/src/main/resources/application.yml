@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: app
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ${DB_PASSWORD}
+
+jwt:
+  secret: ${JWT_SECRET}
+  private:
+    key:
+      path: certs/private_key.pem
+  public:
+    key:
+      path: certs/public_key.pem
+
+logging:
+  level:
+    org.springframework: DEBUG
