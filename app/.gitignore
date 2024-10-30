@@ -2,10 +2,6 @@
 /app/db/testdb.mv.db
 /app/db/testdb.trace.db
 
-# Ignore Spring configuration files
-application.properties
-application-dev.yml
-
 # Ignore any other sensitive files
 
 # Ignoring environment variables
