@@ -20,8 +20,8 @@ public class JwtTokenProvider {
 
     private final String privateKeyPath = "certs/private_key.pem";
     private final String publicKeyPath = "certs/public_key.pem";
-    private PrivateKey privateKey;
-    private PublicKey publicKey;
+    private final PrivateKey privateKey;
+    private final PublicKey publicKey;
 
     public JwtTokenProvider() throws Exception {
         this.privateKey = loadPrivateKey(privateKeyPath);
