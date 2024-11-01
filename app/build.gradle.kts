@@ -5,6 +5,7 @@ plugins {
 	id("jacoco")
 	checkstyle
 	application
+	id("io.sentry.jvm.gradle") version "4.13.0"
 }
 
 group = "hexlet.code"
@@ -18,6 +19,13 @@ java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
 	}
+}
+
+sentry {
+	includeSourceContext = true
+	org = "grand-yf"
+	projectName = "java-spring-boot"
+	authToken = System.getenv("SENTRY_AUTH_TOKEN")
 }
 
 configurations {
