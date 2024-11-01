@@ -80,4 +80,17 @@ public class TaskService {
     public void delete(Long id) {
         taskRepository.deleteById(id);
     }
+
+    /**
+     * Retrieves tasks filtered by given criteria.
+     *
+     * @param titleCont a substring to search for in task titles
+     * @param assigneeId the ID of the assignee
+     * @param status the status slug of the tasks
+     * @param labelId the ID of the label
+     * @return a list of tasks that match the filter criteria
+     */
+    public List<Task> getTasks(String titleCont, Long assigneeId, String status, Long labelId) {
+        return taskRepository.findTasksByFilters(titleCont, assigneeId, status, labelId);
+    }
 }

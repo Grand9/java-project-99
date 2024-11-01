@@ -57,6 +57,33 @@ public class Task {
     private LocalDateTime createdAt;
 
     /**
+     * Gets the title of the task.
+     *
+     * @return the title of the task
+     */
+    public String getTitle() {
+        return name;
+    }
+
+    /**
+     * Gets the status of the task.
+     *
+     * @return the status of the task
+     */
+    public TaskStatus getStatus() {
+        return taskStatus;
+    }
+
+    /**
+     * Sets the status of the task.
+     *
+     * @param taskStatus the new status of the task
+     */
+    public void setStatus(TaskStatus taskStatus) {
+        this.taskStatus = taskStatus;
+    }
+
+    /**
      * Sets the creation time of the task before it is persisted.
      */
     @PrePersist

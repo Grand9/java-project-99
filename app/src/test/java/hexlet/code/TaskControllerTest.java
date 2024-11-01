@@ -3,6 +3,7 @@ package hexlet.code;
 import hexlet.code.controller.TaskController;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
+import hexlet.code.model.User;
 import hexlet.code.service.TaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -87,9 +89,35 @@ public class TaskControllerTest {
         List<Task> tasks = List.of(task);
         when(taskService.findAll()).thenReturn(tasks);
 
-        mockMvc.perform(get("/api/tasks"))
+        mockMvc.perform(get("/api/tasks/all"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Test Task"));
+    }
+
+    @Test
+    public void testGetTasksWithValidParameters() throws Exception {
+        Long validAssigneeId = 1L;
+        String validStatus = "in-progress";
+        Long validLabelId = 1L;
+
+        User assignee = new User();
+        assignee.setId(validAssigneeId);
+        assignee.setFirstName("John");
+        assignee.setLastName("Doe");
+
+        Task task = new Task();
+        task.setId(1L);
+        task.setName("Task Name");
+        task.setDescription("Task Description");
+        task.setAssignee(assignee);
+        task.setTaskStatus(new TaskStatus());
+
+        List<Task> tasks = List.of(task);
+
+        when(taskService.getTasks(null, validAssigneeId, validStatus, validLabelId)).thenReturn(tasks);
+
+        List<Task> resultTasks = taskService.getTasks(null, validAssigneeId, validStatus, validLabelId);
+        assertFalse(resultTasks.isEmpty());
     }
 
     @Test
