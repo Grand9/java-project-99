@@ -22,6 +22,8 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+      - name: Set JAVA_HOME
+        run: echo "JAVA_HOME=${{ github.workspace }}/.sdkman/candidates/java/21" >> $GITHUB_ENV
       - name: Build with Gradle
         run: make build
         env:
