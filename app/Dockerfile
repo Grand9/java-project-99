@@ -1,18 +1,12 @@
-FROM gradle:8.5-jdk21 AS build
-
+FROM openjdk:20-jdk-slim AS build
 WORKDIR /app
+COPY build.gradle settings.gradle ./
+COPY gradle.properties ./
+RUN ./gradlew dependencies
 COPY . .
-
-RUN gradle installDist
-
-FROM eclipse-temurin:21-jdk
-
+RUN ./gradlew build --no-daemon
+FROM openjdk:20-jre-slim
 WORKDIR /app
-
-COPY --from=build /app/build/install/app /app
-
-COPY src/main/resources/certs /app/resources/certs
-
-RUN chmod +x /app/bin/app
-
-CMD ["./bin/app"]
+COPY --from=build /app/build/libs/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
