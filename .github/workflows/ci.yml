@@ -21,20 +21,14 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Set JAVA_HOME
+        run: echo "JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64" >> $GITHUB_ENV
+
       - name: Check JAVA_HOME
         run: echo $JAVA_HOME
 
       - name: Check Java version
         run: java -version
-
-      - name: Install Node.js (if needed)
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-
-      - name: Install npm dependencies
-        run: npm ci
-        working-directory: frontend 
 
       - name: Build with Gradle
         run: ./gradlew build
