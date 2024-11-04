@@ -19,21 +19,18 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+      - name: List installed Java versions
+        run: ls /usr/lib/jvm/
       - name: Set JAVA_HOME
-        run: echo "JAVA_HOME=/usr/lib/jvm/java-21-temurin" >> $GITHUB_ENV
+        run: echo "JAVA_HOME=/usr/lib/jvm/temurin-21" >> $GITHUB_ENV
       - name: Check Java version
         run: java -version
       - name: Build with Gradle
         run: ./gradlew build
-        env:
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Publish code coverage
         uses: paambaati/codeclimate-action@v2.7.1
         env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
           JACOCO_SOURCE_PATH: src/main/java
         with:
           coverageCommand: ./gradlew jacocoTestReport
