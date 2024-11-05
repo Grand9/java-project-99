@@ -17,6 +17,12 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install Sentry CLI
+        run: npm install -g @sentry/cli
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
         with:
@@ -31,7 +37,7 @@ jobs:
         uses: paambaati/codeclimate-action@v2.7.1
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-          JACOCO_SOURCE_PATH: "${{ github.workspace }}/java-project-99/src/main/java"
+          JACOCO_SOURCE_PATH: "${{github.workspace}}/src/main/java"
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
