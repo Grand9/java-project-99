@@ -18,13 +18,15 @@ jobs:
       - name: Set up Gradle
         uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: 8.7
+          gradle-version: 8.5
       - name: Print working directory
         run: pwd
       - name: Run checkstyle
         run: ./gradlew checkstyleMain
       - name: Run tests
-        run: ./gradlew test --args='--spring.profiles.active=dev'
+        env:
+          SPRING_PROFILES_ACTIVE: dev
+        run: ./gradlew test
       - name: Generate JaCoCo report
         run: ./gradlew jacocoTestReport
       - name: Publish code coverage
