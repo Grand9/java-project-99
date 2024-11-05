@@ -32,7 +32,7 @@ jobs:
         uses: paambaati/codeclimate-action@v2.7.1
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-          JACOCO_SOURCE_PATH: java-project-99/src/main/java
+          JACOCO_SOURCE_PATH: "${{github.workspace}}/src/main/java"
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         with:
