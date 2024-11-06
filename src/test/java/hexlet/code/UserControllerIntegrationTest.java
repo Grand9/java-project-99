@@ -47,6 +47,7 @@ public class UserControllerIntegrationTest {
      */
     @BeforeEach
     void setup() {
+        System.out.println("Initializing test setup...");
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
         userRepository.deleteAll();
     }

@@ -15,7 +15,6 @@ logging:
     org.springframework: DEBUG
     org.hibernate: DEBUG
 jwt:
-  secret: ${JWT_SECRET}
   private:
     key:
       path: certs/private_key.pem

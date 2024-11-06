@@ -27,9 +27,10 @@ public class AppConfig {
      * @return CommandLineRunner that initializes the database.
      */
     @Bean
-    CommandLineRunner initDatabase(UserRepository userRepository, PasswordEncoder passwordEncoder, Environment env) {
+    public CommandLineRunner initDatabase(UserRepository userRepository, PasswordEncoder passwordEncoder, Environment env) {
         return args -> {
-            if (Arrays.asList(env.getActiveProfiles()).contains("dev")
+            // Check if the 'dev' profile is active and the user doesn't already exist
+            if (Arrays.stream(env.getActiveProfiles()).anyMatch(profile -> profile.equals("dev"))
                     && userRepository.findByEmail("hexlet@example.com").isEmpty()) {
                 User adminUser = new User();
                 adminUser.setEmail("hexlet@example.com");
@@ -38,5 +39,4 @@ public class AppConfig {
             }
         };
     }
-
 }

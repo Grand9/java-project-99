@@ -2,7 +2,6 @@ package hexlet.code.config;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,16 +14,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.security.PublicKey;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final UserDetailsService userDetailsService;
+    private final PublicKey publicKey;
 
-    @Value("${jwt.secret}")
-    private String jwtSecret;
-
-    public JwtAuthenticationFilter(UserDetailsService userDetailsService) {
+    public JwtAuthenticationFilter(UserDetailsService userDetailsService, PublicKey publicKey) {
         this.userDetailsService = userDetailsService;
+        this.publicKey = publicKey;
     }
 
     /**
@@ -44,7 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             token = token.substring(7);
             try {
                 String username = Jwts.parser()
-                        .setSigningKey(jwtSecret)
+                        .setSigningKey(publicKey)
                         .parseClaimsJws(token)
                         .getBody()
                         .getSubject();

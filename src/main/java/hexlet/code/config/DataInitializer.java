@@ -7,8 +7,9 @@ import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
@@ -45,6 +46,7 @@ public class DataInitializer implements CommandLineRunner {
      * @param args command line arguments
      */
     @Override
+    @Transactional
     public void run(String... args) {
         if (userRepository.findByEmail("hexlet@example.com").isEmpty()) {
             User admin = new User();
