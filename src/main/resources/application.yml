@@ -13,7 +13,7 @@ spring:
 logging:
   level:
     org.springframework: DEBUG
-
+    org.hibernate: DEBUG
 jwt:
   secret: ${JWT_SECRET}
   private:

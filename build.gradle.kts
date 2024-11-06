@@ -80,3 +80,7 @@ tasks.jacocoTestReport {
 		html.required.set(true)
 	}
 }
+
+tasks.sentryBundleSourcesJava {
+	enabled = System.getenv("SENTRY_AUTH_TOKEN") != null
+}

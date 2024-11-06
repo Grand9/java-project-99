@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -33,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Unit tests for the TaskController.
  */
+@ActiveProfiles("dev")
 public class TaskControllerTest {
 
     @Autowired
@@ -105,20 +107,21 @@ public class TaskControllerTest {
         assignee.setFirstName("John");
         assignee.setLastName("Doe");
 
-        Task task = new Task();
-        task.setId(1L);
-        task.setName("Task Name");
-        task.setDescription("Task Description");
-        task.setAssignee(assignee);
-        task.setTaskStatus(new TaskStatus());
+        Task testTask = new Task();
+        testTask.setId(1L);
+        testTask.setName("Task Name");
+        testTask.setDescription("Task Description");
+        testTask.setAssignee(assignee);
+        testTask.setTaskStatus(new TaskStatus());
 
-        List<Task> tasks = List.of(task);
+        List<Task> tasks = List.of(testTask);
 
         when(taskService.getTasks(null, validAssigneeId, validStatus, validLabelId)).thenReturn(tasks);
 
         List<Task> resultTasks = taskService.getTasks(null, validAssigneeId, validStatus, validLabelId);
         assertFalse(resultTasks.isEmpty());
     }
+
 
     @Test
     public void testCreateTask() throws Exception {
