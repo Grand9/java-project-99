@@ -29,11 +29,12 @@ jobs:
         run: ./gradlew test
       - name: Generate JaCoCo report
         run: ./gradlew jacocoTestReport
+      - name: Print JaCoCo report
+        run: cat build/reports/jacoco/test/jacocoTestReport.xml
       - name: Publish code coverage
         uses: paambaati/codeclimate-action@v5.0.0
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         with:
-          coverageCommand: make report
-          coverageLocations: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml:jacoco
+          coverageLocations: build/reports/jacoco/test/jacocoTestReport.xml:jacoco
