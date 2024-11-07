@@ -27,6 +27,10 @@ public class LabelControllerTest {
 
     private Label label;
 
+    /**
+     * Set up the test environment. This method is called before each test.
+     * It initializes the label used in the tests.
+     */
     @BeforeEach
     public void setup() {
         label = new Label("Test Label");
