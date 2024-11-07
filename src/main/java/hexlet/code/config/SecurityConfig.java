@@ -83,28 +83,26 @@ public class SecurityConfig {
      */
     private PublicKey loadPublicKey() throws IOException {
         try {
-            // Example of loading a public key from the classpath
             var publicKeyResource = new ClassPathResource("certs/public_key.pem");
             byte[] keyBytes = publicKeyResource.getInputStream().readAllBytes();
 
-            // Remove the "BEGIN PUBLIC KEY" and "END PUBLIC KEY" parts if they exist
             String keyString = new String(keyBytes);
             keyString = keyString.replace("-----BEGIN PUBLIC KEY-----", "")
                     .replace("-----END PUBLIC KEY-----", "")
-                    .replaceAll("\n", "");
+                    .replaceAll("\n", "")
+                    .replaceAll("\r", "");
 
-            // Decode the base64 string into bytes
+            System.out.println("Public Key String: " + keyString);
+
             byte[] decoded = Base64.getDecoder().decode(keyString);
 
-            // Create the public key spec
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decoded);
-
-            // Generate the public key
             return java.security.KeyFactory.getInstance("RSA").generatePublic(keySpec);
         } catch (Exception e) {
             throw new IOException("Error loading public key", e);
         }
     }
+
 
     /**
      * Configures the authentication manager.

@@ -27,7 +27,8 @@ public class AppConfig {
      * @return CommandLineRunner that initializes the database.
      */
     @Bean
-    public CommandLineRunner initDatabase(UserRepository userRepository, PasswordEncoder passwordEncoder, Environment env) {
+    public CommandLineRunner initDatabase(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                                          Environment env) {
         return args -> {
             // Check if the 'dev' profile is active and the user doesn't already exist
             if (Arrays.stream(env.getActiveProfiles()).anyMatch(profile -> profile.equals("dev"))
