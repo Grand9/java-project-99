@@ -3,6 +3,7 @@ package hexlet.code.controller;
 import hexlet.code.model.Label;
 import hexlet.code.service.LabelService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -55,8 +56,10 @@ public class LabelController {
      */
     @PostMapping
     public ResponseEntity<Label> createLabel(@RequestBody Label label) {
-        return ResponseEntity.ok(labelService.createLabel(label));
+        Label createdLabel = labelService.createLabel(label);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdLabel);
     }
+
 
     /**
      * Updates an existing label.
