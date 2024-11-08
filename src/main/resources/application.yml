@@ -1,23 +1,27 @@
-spring:
-  datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: ${DB_PASSWORD:default_password}
-  h2:
-    console:
-      enabled: true
-  application:
-    name: app
-
 logging:
   level:
-    org.springframework: DEBUG
-    org.hibernate: DEBUG
-jwt:
-  private:
-    key:
-      path: certs/private_key.pem
-  public:
-    key:
-      path: certs/public_key.pem
+    root: WARN
+    org:
+      springframework:
+        security: trace
+spring:
+  application:
+    name: app
+  jpa:
+    show-sql: true
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+  output:
+    ansi:
+      enabled: always
+  profiles:
+    default: development
+
+rsa:
+  private-key: classpath:certs/private_key.pem
+  public-key: classpath:certs/public_key.pem
+  
+sentry:
+  dsn: https://482d489228161b7ed6e06bb6017d838e@o4508223780945920.ingest.de.sentry.io/4508223796281424
+  sentry.traces-sample-rate: 1.0

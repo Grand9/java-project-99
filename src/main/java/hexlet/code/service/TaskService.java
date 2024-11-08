@@ -1,96 +1,64 @@
 package hexlet.code.service;
 
-import hexlet.code.model.Task;
+import hexlet.code.dto.TaskParamDTO;
+import hexlet.code.dto.task.TaskCreateDTO;
+import hexlet.code.dto.task.TaskDTO;
+import hexlet.code.dto.task.TaskUpdateDTO;
+import hexlet.code.exception.ResourceNotFoundException;
+import hexlet.code.mapper.TaskMapper;
+import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
+import hexlet.code.repository.TaskStatusRepository;
+import hexlet.code.repository.UserRepository;
+import hexlet.code.specification.TaskSpecification;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
-/**
- * Service for managing tasks.
- */
 @Service
 public class TaskService {
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private TaskRepository taskRepository;
+    @Autowired
+    private TaskStatusRepository taskStatusRepository;
+    @Autowired
+    private LabelRepository labelRepository;
+    @Autowired
+    private TaskMapper taskMapper;
+    @Autowired
+    private TaskSpecification taskSpecification;
 
-    private final TaskRepository taskRepository;
-
-    public TaskService(TaskRepository taskRepository) {
-        this.taskRepository = taskRepository;
+    public List<TaskDTO> getAll(TaskParamDTO params, PageRequest pageRequest) {
+        var specification = taskSpecification.build(params);
+        var tasks = taskRepository.findAll(specification, pageRequest);
+        return tasks.stream().map(taskMapper::map).toList();
     }
 
-    /**
-     * Retrieves all tasks.
-     *
-     * @return a list of all tasks
-     */
-    @Transactional(readOnly = true)
-    public List<Task> findAll() {
-        return taskRepository.findAll();
+    public TaskDTO show(Long id) {
+        var task = taskRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Task with id " + id + " not found"));
+        return taskMapper.map(task);
     }
 
-    /**
-     * Finds a task by its ID.
-     *
-     * @param id the ID of the task
-     * @return an Optional containing the task if found, otherwise empty
-     */
-    @Transactional(readOnly = true)
-    public Optional<Task> findById(Long id) {
-        return taskRepository.findById(id);
+    public TaskDTO create(TaskCreateDTO dto) {
+        var task = taskMapper.map(dto);
+        taskRepository.save(task);
+        return taskMapper.map(task);
     }
 
-    /**
-     * Creates a new task.
-     *
-     * @param task the task to create
-     * @return the created task
-     */
-    @Transactional
-    public Task create(Task task) {
-        return taskRepository.save(task);
+    public TaskDTO update(TaskUpdateDTO dto, Long taskId) {
+        var task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task with id: " + taskId + " not found."));
+        taskMapper.update(dto, task);
+        taskRepository.save(task);
+        return taskMapper.map(task);
     }
 
-    /**
-     * Updates an existing task.
-     *
-     * @param id the ID of the task to update
-     * @param taskDetails the updated task details
-     * @return the updated task
-     */
-    @Transactional
-    public Task update(Long id, Task taskDetails) {
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
-        task.setName(taskDetails.getName());
-        task.setIndex(taskDetails.getIndex());
-        task.setDescription(taskDetails.getDescription());
-        task.setTaskStatus(taskDetails.getTaskStatus());
-        task.setAssignee(taskDetails.getAssignee());
-        return taskRepository.save(task);
-    }
-
-    /**
-     * Deletes a task by its ID.
-     *
-     * @param id the ID of the task to delete
-     */
-    @Transactional
-    public void delete(Long id) {
+    public void destroy(Long id) {
         taskRepository.deleteById(id);
-    }
-
-    /**
-     * Retrieves tasks filtered by given criteria.
-     *
-     * @param titleCont a substring to search for in task titles
-     * @param assigneeId the ID of the assignee
-     * @param status the status slug of the tasks
-     * @param labelId the ID of the label
-     * @return a list of tasks that match the filter criteria
-     */
-    public List<Task> getTasks(String titleCont, Long assigneeId, String status, Long labelId) {
-        return taskRepository.findTasksByFilters(titleCont, assigneeId, status, labelId);
     }
 }

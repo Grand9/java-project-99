@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:lso
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+debug: true
+logging:
+  level:
+    root: DEBUG
+    org.springframework.web: DEBUG
+    org.apache.coyote.http11: DEBUG

@@ -1,86 +1,54 @@
 package hexlet.code.service;
 
+import hexlet.code.dto.label.LabelCreateDTO;
+import hexlet.code.dto.label.LabelDTO;
+import hexlet.code.dto.label.LabelUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
-import hexlet.code.model.Label;
+import hexlet.code.mapper.LabelMapper;
 import hexlet.code.repository.LabelRepository;
-import hexlet.code.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Service for managing labels.
- * This class is designed for extension.
- * To safely extend this class, please override the methods with caution.
- */
 @Service
 public class LabelService {
     @Autowired
     private LabelRepository labelRepository;
-
     @Autowired
-    private TaskRepository taskRepository;
+    private LabelMapper labelMapper;
 
-    /**
-     * Retrieves all labels.
-     *
-     * @return a list of all labels
-     */
-    public List<Label> getAllLabels() {
-        return labelRepository.findAll();
+    public List<LabelDTO> getAll() {
+        var labels = labelRepository.findAll();
+        return labels.stream()
+                .map(labelMapper::map)
+                .toList();
     }
 
-    /**
-     * Retrieves a label by its ID.
-     *
-     * @param id the ID of the label to retrieve
-     * @return the label with the specified ID
-     */
-    public Label getLabelById(Long id) {
-        return labelRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Label not found"));
+    public LabelDTO show(Long id) {
+        var label = labelRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Label with id " + id + " not found"));
+        return labelMapper.map(label);
     }
 
-    /**
-     * Creates a new label.
-     *
-     * @param label the label to create
-     * @return the created label
-     */
-    public Label createLabel(Label label) {
-        label.setCreatedAt(LocalDateTime.now());
-        return labelRepository.save(label);
+    public LabelDTO create(LabelCreateDTO dto) {
+        var label = labelMapper.map(dto);
+        labelRepository.save(label);
+        var out = labelMapper.map(label);
+        return out;
     }
 
-    /**
-     * Updates an existing label.
-     *
-     * @param id the ID of the label to update
-     * @param labelDetails the new details of the label
-     * @return the updated label
-     */
-    public Label updateLabel(Long id, Label labelDetails) {
-        Label label = getLabelById(id);
-        label.setName(labelDetails.getName());
-        return labelRepository.save(label);
+    public LabelDTO update(LabelUpdateDTO dto, Long id) {
+        var label = labelRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Label with id " + id + " not found"));
+        labelMapper.update(dto, label);
+        labelRepository.save(label);
+        return labelMapper.map(label);
     }
 
-    /**
-     * Deletes a label by its ID.
-     *
-     * @param id the ID of the label to delete
-     * @throws IllegalStateException if the label is associated with tasks
-     */
-    public void deleteLabel(Long id) {
-        Label label = getLabelById(id);
-        if (labelHasTasks(label)) {
-            throw new IllegalStateException("Cannot delete label that is associated with tasks");
-        }
-        labelRepository.delete(label);
-    }
-
-    private boolean labelHasTasks(Label label) {
-        return !taskRepository.findByLabels(label).isEmpty();
+    public void destroy(Long id) {
+        labelRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Label with id " + id + " not found"));
+        labelRepository.deleteById(id);
     }
 }

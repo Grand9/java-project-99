@@ -1,122 +1,71 @@
 package hexlet.code.config;
 
-import jakarta.servlet.Filter;
+import hexlet.code.service.CustomUserDetailsService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import java.io.IOException;
-import java.security.PublicKey;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 @Configuration
 @EnableWebSecurity
+@AllArgsConstructor
 public class SecurityConfig {
-
     @Autowired
-    @Lazy
-    private UserDetailsService userDetailsService;
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private JwtDecoder jwtDecoder;
+    @Autowired
+    private CustomUserDetailsService userService;
 
-    /**
-     * Configures the security filter chain.
-     *
-     * @param http The HttpSecurity object to be configured.
-     * @return The configured SecurityFilterChain.
-     * @throws Exception If an error occurs during configuration.
-     */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
-                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/task_statuses").authenticated()
-                        .requestMatchers("/api/task_statuses/**").authenticated()
-                        .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers("/v3/api-docs/**").permitAll()
-                        .anyRequest().permitAll())
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+    public SecurityFilterChain filterChain(
+            HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
+        var mvcMatcherBuilder = new MvcRequestMatcher.Builder(introspector);
 
-        return http.build();
+        return http.csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
+                        .requestMatchers(mvcMatcherBuilder.pattern("/")).permitAll()
+                        .requestMatchers(mvcMatcherBuilder.pattern("/welcome")).permitAll()
+                        .requestMatchers(mvcMatcherBuilder.pattern("/api/login")).permitAll()
+                        .requestMatchers(mvcMatcherBuilder.pattern("/index.html")).permitAll()
+                        .requestMatchers(mvcMatcherBuilder.pattern("/assets/**")).permitAll()
+                        .requestMatchers(mvcMatcherBuilder.pattern("/v3/api-docs/**")).permitAll()
+                        .requestMatchers(mvcMatcherBuilder.pattern("/swagger-ui/**")).permitAll()
+                        .requestMatchers(mvcMatcherBuilder.pattern("/swagger-ui/index.html")).permitAll()
+                        .anyRequest().authenticated())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .oauth2ResourceServer((rs) -> rs.jwt((jwt) -> jwt.decoder(jwtDecoder)))
+                .httpBasic(Customizer.withDefaults())
+                .build();
     }
 
-    /**
-     * Provides a password encoder.
-     *
-     * @return A PasswordEncoder instance.
-     */
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        return http.getSharedObject(AuthenticationManagerBuilder.class).build();
     }
 
-    /**
-     * Provides a JWT authentication filter.
-     *
-     * @return A JwtAuthenticationFilter instance.
-     * @throws IOException If there is an issue with reading the public key.
-     */
     @Bean
-    public Filter jwtAuthenticationFilter() throws IOException {
-        PublicKey publicKey = loadPublicKey();
-        return new JwtAuthenticationFilter(userDetailsService, publicKey);
-    }
-
-    /**
-     * Loads the public key from the classpath.
-     *
-     * @return The PublicKey instance.
-     * @throws IOException If there is an issue with reading the public key.
-     */
-    private PublicKey loadPublicKey() throws IOException {
-        try {
-            var publicKeyResource = new ClassPathResource("certs/public_key.pem");
-            byte[] keyBytes = publicKeyResource.getInputStream().readAllBytes();
-
-            String keyString = new String(keyBytes);
-            keyString = keyString.replace("-----BEGIN PUBLIC KEY-----", "")
-                    .replace("-----END PUBLIC KEY-----", "")
-                    .replaceAll("\n", "")
-                    .replaceAll("\r", "");
-
-            System.out.println("Public Key String: " + keyString);
-
-            byte[] decoded = Base64.getDecoder().decode(keyString);
-
-            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decoded);
-            return java.security.KeyFactory.getInstance("RSA").generatePublic(keySpec);
-        } catch (Exception e) {
-            throw new IOException("Error loading public key", e);
-        }
-    }
-
-
-    /**
-     * Configures the authentication manager.
-     *
-     * @param http The HttpSecurity object.
-     * @return The configured AuthenticationManager.
-     * @throws Exception If an error occurs during configuration.
-     */
-    @Bean
-    public AuthenticationManager authManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder =
-                http.getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder());
-        return authenticationManagerBuilder.build();
+    public AuthenticationProvider daoAuthProvider(AuthenticationManagerBuilder auth) {
+        var provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userService);
+        provider.setPasswordEncoder(passwordEncoder);
+        return provider;
     }
 }
