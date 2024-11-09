@@ -58,10 +58,9 @@ tasks.jacocoTestReport {
 	reports {
 		xml.required = true
 	}
-}
-
-tasks.test {
-	useJUnitPlatform()
+	sourceDirectories = files("src/main/java/hexlet/code")
+	classDirectories = files("build/classes")
+	additionalSourceDirs = files("src/main/java/hexlet/code")
 }
 
 sentry {
