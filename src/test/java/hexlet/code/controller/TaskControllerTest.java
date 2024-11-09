@@ -1,4 +1,4 @@
-package hexlet.code;
+package hexlet.code.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.task.TaskCreateDTO;
@@ -62,15 +62,9 @@ class TaskControllerTest {
     private ModelGenerator modelGenerator;
 
     @Autowired
-    private ObjectMapper om;
-
-    private User testUser;
-
-    private TaskStatus testTaskStatus;
+    private ObjectMapper objectMapper;
 
     private Task testTask;
-
-    private Label testLabel;
 
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
 
@@ -78,10 +72,10 @@ class TaskControllerTest {
     public void setup() {
         token = jwt().jwt(builder -> builder.subject("aaa@bbb.com"));
 
-        testUser = Instancio.of(modelGenerator.getUserModel()).create();
-        testTaskStatus = Instancio.of(modelGenerator.getStatusModel()).create();
+        User testUser = Instancio.of(modelGenerator.getUserModel()).create();
+        TaskStatus testTaskStatus = Instancio.of(modelGenerator.getStatusModel()).create();
         testTask = Instancio.of(modelGenerator.getTaskModel()).create();
-        testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
+        Label testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
 
         userRepository.save(testUser);
         taskStatusRepository.save(testTaskStatus);
@@ -117,7 +111,7 @@ class TaskControllerTest {
         var request = post("/api/tasks")
                 .with(token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(data));
+                .content(objectMapper.writeValueAsString(data));
 
         mockMvc.perform(request).andExpect(status().isCreated());
         var task = taskRepository.findByName(data.getTitle()).get();
@@ -126,65 +120,6 @@ class TaskControllerTest {
         assertThat(task.getName()).isEqualTo(data.getTitle());
         assertThat(task.getTaskStatus().getSlug()).isEqualTo(data.getSlug());
     }
-
-   // @Test
-   // public void testIndexTaskTest() throws Exception {
-        //восстановление очередности проблемного автотеста хекслета
-        /*2024-11-06T08:53:35.550Z DEBUG 185 --- [    Test worker] o.s.security.web.FilterChainProxy
-        : Securing POST /api/task_statuses
-        app-1  |     2024-11-06T08:53:35.551Z DEBUG 185 --- [    Test worker] o.s.security.web.FilterChainProxy
-        : Secured POST /api/task_statuses
-        app-1  |     Hibernate: insert into task_statuses (created_at,name,slug,id) values (?,?,?,default)
-        app-1  |     2024-11-06T08:53:35.556Z DEBUG 185 --- [    Test worker] o.s.security.web.FilterChainProxy
-        : Securing POST /api/labels
-        app-1  |     2024-11-06T08:53:35.556Z DEBUG 185 --- [    Test worker] o.s.security.web.FilterChainProxy
-        : Secured POST /api/labels
-        app-1  |     Hibernate: insert into labels (created_at,name,id) values (?,?,default)
-        app-1  |     2024-11-06T08:53:35.559Z DEBUG 185 --- [    Test worker] o.s.security.web.FilterChainProxy
-        : Securing GET /api/labels
-        app-1  |     2024-11-06T08:53:35.560Z DEBUG 185 --- [    Test worker] o.s.security.web.FilterChainProxy
-        : Secured GET /api/labels
-        app-1  |     Hibernate: select l1_0.id,l1_0.created_at,l1_0.name from labels l1_0
-        app-1  |     2024-11-06T08:53:35.569Z DEBUG 185 --- [    Test worker] o.s.security.web.FilterChainProxy
-        : Securing POST /api/tasks
-        app-1  |     2024-11-06T08:53:35.570Z DEBUG 185 --- [    Test worker] o.s.security.web.FilterChainProxy
-        : Secured POST /api/tasks
-        apHibernate: select ts1_0.id,ts1_0.created_at,ts1_0.name,ts1_0.slug from task_statuses ts1_0 where ts1_0.slug=?
-        app-1  |     Hibernate: select l1_0.id,l1_0.created_at,l1_0.name from labels l1_0 where l1_0.id in (?)*/
-
-/*
-        //Hibernate: insert into task_statuses (created_at,name,slug,id) values (?,?,?,default)
-        //: Secured POST /api/task_statuses
-        var status = new TaskStatusCreateDTO("new Status", "newStatus");
-        var requestStatusCreate = post("/api/task_statuses")
-                .with(token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(status));
-        mockMvc.perform(requestStatusCreate).andExpect(status().isCreated());
-
-        //Hibernate: insert into labels (created_at,name,id) values (?,?,default)    : Secured POST /api/labels
-        var label = new LabelCreateDTO();
-        label.setName("new label name");
-        var requestLabelCreate = post("/api/labels")
-                .with(token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(label));
-        mockMvc.perform(requestLabelCreate).andExpect(status().isCreated());
-
-        //Hibernate: select l1_0.id,l1_0.created_at,l1_0.name from labels l1_0    :Secured GET /api/labels
-        var countLabelsRepo = labelRepository.count();
-        var requestLabelAll = get("/api/labels").with(token);
-        var responseResultLabels = mockMvc.perform(requestLabelAll)
-                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-        assertThatJson(responseResultLabels).isArray();
-
-        List<LabelDTO> listLabelsDTO = om.readValue(responseResultLabels, new TypeReference<List<LabelDTO>>() { });
-        assertThat(listLabelsDTO.size()).isEqualTo(countLabelsRepo);
-
-        var insertedStatus = statusRepository.findBySlug(status.getSlug()).get();
-        //var insertedLabel = labelRepository.findByIdIn(listLabelsDTO.).get();
-
-    }*/
 
     @Test
     public void testUpdate() throws Exception {
@@ -196,7 +131,7 @@ class TaskControllerTest {
         var request = put("/api/tasks/" + testTask.getId())
                 .with(token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(updatedData));
+                .content(objectMapper.writeValueAsString(updatedData));
 
         mockMvc.perform(request).andExpect(status().isOk());
 
@@ -215,7 +150,7 @@ class TaskControllerTest {
         var request = post("/api/tasks")
                 .with(token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(fakeTask));
+                .content(objectMapper.writeValueAsString(fakeTask));
 
         mockMvc.perform(request).andExpect(status().isBadRequest());
     }

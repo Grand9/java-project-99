@@ -1,4 +1,4 @@
-package hexlet.code;
+package hexlet.code.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.label.LabelCreateDTO;
@@ -43,7 +43,7 @@ class LabelControllerTest {
     private ModelGenerator modelGenerator;
 
     @Autowired
-    private ObjectMapper om;
+    private ObjectMapper objectMapper;
 
     private Label testLabel;
 
@@ -80,7 +80,7 @@ class LabelControllerTest {
         var request = post("/api/labels")
                 .with(token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(data));
+                .content(objectMapper.writeValueAsString(data));
 
         mockMvc.perform(request).andExpect(status().isCreated());
 
@@ -97,7 +97,7 @@ class LabelControllerTest {
         var request = put("/api/labels/" + testLabel.getId())
                 .with(token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(data));
+                .content(objectMapper.writeValueAsString(data));
 
         mockMvc.perform(request).andExpect(status().isOk());
 
@@ -108,16 +108,17 @@ class LabelControllerTest {
 
     @Test
     public void testCreateWithInvalidData() throws Exception {
-        var data = new HashMap<String, String>(Map.of(
+        var data = new HashMap<>(Map.of(
                 "name", "ne"
         ));
-        var request = put("/api/labels/" + testLabel.getId())
+        var request = post("/api/labels")
                 .with(token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(data));
+                .content(objectMapper.writeValueAsString(data));
 
         mockMvc.perform(request).andExpect(status().isBadRequest());
     }
+
 
     @Test
     public void testDelete() throws Exception {
