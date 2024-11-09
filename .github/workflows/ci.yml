@@ -9,38 +9,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 21
-        uses: actions/setup-java@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: '21'
-          distribution: 'corretto'
-      - name: Set up Gradle
-        uses: gradle/gradle-build-action@v2
+          distribution: 'temurin'
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v3
         with:
           gradle-version: 8.7
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: build
-      - name: Print working directory
-        run: pwd
-      - name: Run checkstyle
-        run: ./gradlew checkstyleMain
-      - name: Run tests
-        env:
-          SPRING_PROFILES_ACTIVE: dev
-        run: ./gradlew test
+      - run: |
+          make lint
+      - run: |
+          make test
       - name: Generate JaCoCo report
         run: ./gradlew jacocoTestReport
-      - name: Print JaCoCo report
-        run: cat build/reports/jacoco/test/jacocoTestReport.xml
-      - name: Publish code coverage
+      - name: Code coverage
         uses: paambaati/codeclimate-action@v5.0.0
         env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
+          JACOCO_SOURCE_PATH: src/main/java
         with:
-          coverageLocations: build/reports/jacoco/test/jacocoTestReport.xml
           coverageCommand: ./gradlew jacocoTestReport
-          prefix: src/main/java/hexlet/code
+          debug: true
+          coverageLocations: ${{github.workspace}}/build/reports/jacoco/test/jacocoTestReport.xml
+
