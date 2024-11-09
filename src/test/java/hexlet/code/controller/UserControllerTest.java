@@ -15,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.HashMap;
 
@@ -24,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -55,7 +55,7 @@ public class UserControllerTest {
     @Test
     public void testIndex() throws Exception {
         saveTestUser();
-        var result = mockMvc.perform(get(USERS_API_URL).with(token))
+        var result = mockMvc.perform(MockMvcRequestBuilders.get(USERS_API_URL).with(token))
                 .andExpect(status().isOk())
                 .andReturn();
         assertThatJson(result.getResponse().getContentAsString()).isArray();
@@ -64,7 +64,7 @@ public class UserControllerTest {
     @Test
     public void testShow() throws Exception {
         saveTestUser();
-        var result = mockMvc.perform(get(USERS_API_URL + "/" + testUser.getId()).with(token))
+        var result = mockMvc.perform(MockMvcRequestBuilders.get(USERS_API_URL + "/" + testUser.getId()).with(token))
                 .andExpect(status().isOk())
                 .andReturn();
         assertThatJson(result.getResponse().getContentAsString()).and(
@@ -79,7 +79,7 @@ public class UserControllerTest {
         createdUser.setPassword("123");
         createdUser.setEmail("ccccc@ddddd.com");
 
-        mockMvc.perform(post(USERS_API_URL)
+        mockMvc.perform(MockMvcRequestBuilders.post(USERS_API_URL)
                         .with(token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createdUser)))
@@ -96,7 +96,7 @@ public class UserControllerTest {
         invalidUser.put("email", "2");
         invalidUser.put("password", "0");
 
-        mockMvc.perform(post(USERS_API_URL)
+        mockMvc.perform(MockMvcRequestBuilders.post(USERS_API_URL)
                         .with(token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidUser)))
@@ -109,7 +109,7 @@ public class UserControllerTest {
         var updatedData = new UserUpdateDTO();
         updatedData.setFirstName(JsonNullable.of("UpdatedName"));
 
-        mockMvc.perform(put(USERS_API_URL + "/" + testUser.getId())
+        mockMvc.perform(MockMvcRequestBuilders.put(USERS_API_URL + "/" + testUser.getId())
                         .with(token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedData)))
@@ -124,7 +124,7 @@ public class UserControllerTest {
     public void testDelete() throws Exception {
         saveTestUser();
 
-        mockMvc.perform(delete(USERS_API_URL + "/" + testUser.getId()).with(token))
+        mockMvc.perform(MockMvcRequestBuilders.delete(USERS_API_URL + "/" + testUser.getId()).with(token))
                 .andExpect(status().isNoContent());
 
         assertThat(userRepository.existsById(testUser.getId())).isFalse();
@@ -133,6 +133,6 @@ public class UserControllerTest {
     @Test
     public void testIndexWithoutAuth() throws Exception {
         saveTestUser();
-        mockMvc.perform(get(USERS_API_URL)).andExpect(status().isUnauthorized());
+        mockMvc.perform(MockMvcRequestBuilders.get(USERS_API_URL)).andExpect(status().isUnauthorized());
     }
 }
