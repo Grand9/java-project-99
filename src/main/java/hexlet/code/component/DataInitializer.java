@@ -11,8 +11,7 @@ import hexlet.code.repository.UserRepository;
 import hexlet.code.service.CustomUserDetailsService;
 import hexlet.code.service.LabelService;
 import hexlet.code.service.TaskStatusService;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -20,26 +19,16 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class DataInitializer implements ApplicationRunner {
 
-    @Autowired
-    private UserRepository userRepository;
 
-    @Autowired
-    private TaskStatusRepository taskStatusRepository;
-
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
-
-    @Autowired
-    private TaskStatusService taskStatusService;
-
-    @Autowired
-    private LabelRepository labelRepository;
-
-    @Autowired
-    private LabelService labelService;
+    private final UserRepository userRepository;
+    private final TaskStatusRepository taskStatusRepository;
+    private final CustomUserDetailsService customUserDetailsService;
+    private final TaskStatusService taskStatusService;
+    private final LabelRepository labelRepository;
+    private final LabelService labelService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -66,9 +55,7 @@ public class DataInitializer implements ApplicationRunner {
         defaultStatuses.add(new TaskStatusCreateDTO("toPublish", "to_publish"));
         defaultStatuses.add(new TaskStatusCreateDTO("Published", "published"));
 
-        var currentStatuses = taskStatusRepository.findAll().stream()
-                .map(TaskStatus::getSlug)
-                .toList();
+        var currentStatuses = taskStatusRepository.findAll().stream().map(TaskStatus::getSlug).toList();
 
         for (var status : defaultStatuses) {
             if (!currentStatuses.contains(status.getSlug())) {
@@ -88,9 +75,7 @@ public class DataInitializer implements ApplicationRunner {
         labelBug.setName("bug");
         defaultLabels.add(labelBug);
 
-        var currentLabels = labelRepository.findAll().stream()
-                .map(Label::getName)
-                .toList();
+        var currentLabels = labelRepository.findAll().stream().map(Label::getName).toList();
 
         for (var label : defaultLabels) {
             if (!currentLabels.contains(label.getName())) {

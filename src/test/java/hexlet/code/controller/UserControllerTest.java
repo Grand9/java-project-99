@@ -106,6 +106,11 @@ public class UserControllerTest {
     @Test
     public void testUpdate() throws Exception {
         saveTestUser();
+
+        String originalFirstName = testUser.getFirstName();
+        String originalLastName = testUser.getLastName();
+        String originalEmail = testUser.getEmail();
+
         var updatedData = new UserUpdateDTO();
         updatedData.setFirstName(JsonNullable.of("UpdatedName"));
 
@@ -117,8 +122,12 @@ public class UserControllerTest {
 
         var updatedUser = userRepository.findById(testUser.getId()).orElse(null);
         assert updatedUser != null;
-        assertThat(updatedUser.getFirstName()).isEqualTo(updatedData.getFirstName().get());
+        assertThat(updatedUser.getFirstName()).isEqualTo("UpdatedName");
+
+        assertThat(updatedUser.getLastName()).isEqualTo(originalLastName);
+        assertThat(updatedUser.getEmail()).isEqualTo(originalEmail);
     }
+
 
     @Test
     public void testDelete() throws Exception {
