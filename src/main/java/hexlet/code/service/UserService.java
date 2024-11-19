@@ -44,7 +44,8 @@ public class UserService {
 
         var authenticationUser = utils.getCurrentUser();
         if (authenticationUser == null || !authenticationUser.getId().equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to update this account");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You do not have permission to update this account");
         }
 
         userMapper.update(dto, user);
@@ -58,7 +59,8 @@ public class UserService {
 
         var authenticationUser = utils.getCurrentUser();
         if (authenticationUser == null || !authenticationUser.getId().equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to delete this account");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You do not have permission to delete this account");
         }
         userRepository.deleteById(id);
     }

@@ -65,14 +65,17 @@ public class TaskStatusService {
         var authenticationUser = userUtils.getCurrentUser();
 
         if (authenticationUser == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to perform this action");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You do not have permission to perform this action");
         }
 
         var task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
 
-        if (!authenticationUser.getEmail().equals("hexlet@example.com") && !authenticationUser.getId().equals(task.getAssignee().getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to perform this action on this task status");
+        if (!authenticationUser.getEmail().equals("hexlet@example.com")
+                && !authenticationUser.getId().equals(task.getAssignee().getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You do not have permission to perform this action on this task status");
         }
     }
 }

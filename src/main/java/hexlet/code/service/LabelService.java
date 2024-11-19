@@ -65,7 +65,8 @@ public class LabelService {
         var authenticationUser = utils.getCurrentUser();
 
         if (authenticationUser == null || !authenticationUser.getEmail().equals("hexlet@example.com")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to perform this action");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You do not have permission to perform this action");
         }
     }
 }
