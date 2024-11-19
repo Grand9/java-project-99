@@ -129,7 +129,7 @@ class TaskControllerTest {
         updatedData.setAssigneeId(JsonNullable.of(2L));
 
         var request = put("/api/tasks/" + testTask.getId())
-                .with(token)
+                .with(jwt().jwt(builder -> builder.subject("hexlet@example.com")))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updatedData));
 
@@ -159,7 +159,8 @@ class TaskControllerTest {
 
     @Test
     public void testDelete() throws Exception {
-        mockMvc.perform(delete("/api/tasks/" + testTask.getId()).with(token))
+        mockMvc.perform(delete("/api/tasks/" + testTask.getId())
+                        .with(jwt().jwt(builder -> builder.subject("hexlet@example.com"))))
                 .andExpect(status().isNoContent());
     }
 }

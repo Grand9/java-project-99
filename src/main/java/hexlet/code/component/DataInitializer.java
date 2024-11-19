@@ -39,9 +39,15 @@ public class DataInitializer implements ApplicationRunner {
     }
 
     private void createUserIfNotExists() {
-        if (userRepository.findByEmail("hexlet@example.com").isEmpty()) {
+        createUser("hexlet@example.com");
+        createUser("test@example.com");
+        createUser("test1@example.com");
+    }
+
+    private void createUser(String email) {
+        if (userRepository.findByEmail(email).isEmpty()) {
             var userData = new User();
-            userData.setEmail("hexlet@example.com");
+            userData.setEmail(email);
             userData.setPassword("qwerty");
             customUserDetailsService.createUser(userData);
         }

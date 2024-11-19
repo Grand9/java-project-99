@@ -15,14 +15,15 @@ public class UserUtils {
     public User getCurrentUser() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            return null;
+            throw new IllegalStateException("No authenticated user found");
         }
         var email = authentication.getName();
-        return userRepository.findByEmail(email).get();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalStateException("Authenticated user not found in database"));
     }
 
     public User getTestUser() {
-        return  userRepository.findByEmail("hexlet@example.com")
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        return userRepository.findByEmail("hexlet@example.com")
+                .orElseThrow(() -> new IllegalStateException("Test user not found"));
     }
 }

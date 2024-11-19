@@ -6,7 +6,11 @@ import hexlet.code.dto.taskStatus.TaskStatusUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.repository.TaskStatusRepository;
+import hexlet.code.repository.TaskRepository;
+import hexlet.code.util.UserUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +21,8 @@ public class TaskStatusService {
 
     private final TaskStatusMapper mapper;
     private final TaskStatusRepository repository;
+    private final TaskRepository taskRepository;
+    private final UserUtils userUtils;
 
     public TaskStatusDTO show(Long id) {
         var taskStatus = repository.findById(id)
@@ -38,12 +44,35 @@ public class TaskStatusService {
     public TaskStatusDTO update(TaskStatusUpdateDTO dto, Long id) {
         var taskStatus = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task status with id " + id + " not found"));
+
+        checkUserPermissions(id);
+
         mapper.update(dto, taskStatus);
         repository.save(taskStatus);
         return mapper.map(taskStatus);
     }
 
     public void destroy(Long id) {
+        var taskStatus = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Task status with id " + id + " not found"));
+
+        checkUserPermissions(id);
+
         repository.deleteById(id);
+    }
+
+    private void checkUserPermissions(Long taskId) {
+        var authenticationUser = userUtils.getCurrentUser();
+
+        if (authenticationUser == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to perform this action");
+        }
+
+        var task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
+
+        if (!authenticationUser.getEmail().equals("hexlet@example.com") && !authenticationUser.getId().equals(task.getAssignee().getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to perform this action on this task status");
+        }
     }
 }

@@ -51,7 +51,7 @@ class TaskStatusControllerTest {
 
     @BeforeEach
     public void setup() {
-        token = jwt().jwt(builder -> builder.subject("aaa@bbb.com"));
+        token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
         testTaskStatus = Instancio.of(modelGenerator.getStatusModel()).create();
         repository.save(testTaskStatus);
     }
@@ -92,7 +92,7 @@ class TaskStatusControllerTest {
         updatedData.setName(JsonNullable.of("newses"));
 
         var request = put(TASK_STATUSES_API_URL + "/" + testTaskStatus.getId())
-                .with(token)
+                .with(jwt().jwt(builder -> builder.subject("hexlet@example.com")))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updatedData));
 
@@ -120,9 +120,13 @@ class TaskStatusControllerTest {
 
     @Test
     public void testDelete() throws Exception {
-        mockMvc.perform(delete(TASK_STATUSES_API_URL + "/" + testTaskStatus.getId()).with(token))
+        assertThat(repository.existsById(testTaskStatus.getId())).isTrue();
+
+        mockMvc.perform(delete(TASK_STATUSES_API_URL + "/" + testTaskStatus.getId())
+                        .with(jwt().jwt(builder -> builder.subject("hexlet@example.com"))))
                 .andExpect(status().isNoContent());
 
         assertThat(repository.existsById(testTaskStatus.getId())).isFalse();
     }
+
 }
