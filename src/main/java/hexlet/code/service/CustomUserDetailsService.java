@@ -12,13 +12,14 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsManager {
-
     private final UserRepository userRepository;
+
     private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Override
@@ -30,6 +31,7 @@ public class CustomUserDetailsService implements UserDetailsManager {
         u.setEmail(user.getUsername());
         var hashedPassword = passwordEncoder.encode(user.getPassword());
         u.setPassword(hashedPassword);
+        //var u = UserUtils.getCurrentUser();
         userRepository.save(u);
     }
 

@@ -20,7 +20,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class TaskService {
-
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
     private final TaskStatusRepository taskStatusRepository;
@@ -52,6 +51,7 @@ public class TaskService {
         taskMapper.update(dto, task);
         taskRepository.save(task);
         return taskMapper.map(task);
+
     }
 
     public void destroy(Long id) {

@@ -9,6 +9,7 @@ import hexlet.code.repository.UserRepository;
 import hexlet.code.util.UserUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -19,6 +20,7 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
     private final UserUtils utils;
 
     public UserDTO show(Long id) {
@@ -35,19 +37,17 @@ public class UserService {
     public UserDTO create(UserCreateDTO dto) {
         var user = userMapper.map(dto);
         userRepository.save(user);
+
         return userMapper.map(user);
     }
 
     public UserDTO update(UserUpdateDTO dto, Long id) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
-
         var authenticationUser = utils.getCurrentUser();
-        if (authenticationUser == null || !authenticationUser.getId().equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "You do not have permission to update this account");
+        if (!authenticationUser.getEmail().equals(user.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-
         userMapper.update(dto, user);
         userRepository.save(user);
         return userMapper.map(user);
@@ -56,12 +56,9 @@ public class UserService {
     public void destroy(Long id) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
-
         var authenticationUser = utils.getCurrentUser();
-        if (authenticationUser == null || !authenticationUser.getId().equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "You do not have permission to delete this account");
+        if (authenticationUser.getEmail().equals(user.getEmail())) {
+            userRepository.deleteById(id);
         }
-        userRepository.deleteById(id);
     }
 }

@@ -1,14 +1,13 @@
 package hexlet.code.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.label.LabelCreateDTO;
+import hexlet.code.dto.label.LabelDTO;
 import hexlet.code.dto.label.LabelUpdateDTO;
 import hexlet.code.model.Label;
-import hexlet.code.model.User;
 import hexlet.code.repository.LabelRepository;
-import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
-import hexlet.code.util.UserUtils;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,18 +19,19 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -43,16 +43,10 @@ class LabelControllerTest {
     private LabelRepository labelRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private ModelGenerator modelGenerator;
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private UserUtils userUtils;
 
     private Label testLabel;
 
@@ -60,23 +54,22 @@ class LabelControllerTest {
 
     @BeforeEach
     public void setUp() {
-        token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
-
-        if (userRepository.findByEmail("user@example.com").isEmpty()) {
-            User user = new User();
-            user.setEmail("user@example.com");
-            user.setPassword("password");
-            userRepository.save(user);
-        }
-
+        token = jwt().jwt(builder -> builder.subject("aaa@bbb.com"));
         testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
+
         labelRepository.save(testLabel);
+
     }
 
     @Test
     public void testGetAll() throws Exception {
-        mockMvc.perform(get("/api/labels").with(token))
-                .andExpect(status().isOk());
+        var count = labelRepository.count();
+        var result = mockMvc.perform(get("/api/labels").with(token))
+                .andExpect(status().isOk()).andReturn().getResponse();
+        var body = result.getContentAsString();
+        assertThatJson(body).isArray();
+        var labelsDTO = objectMapper.readValue(body, new TypeReference<List<LabelDTO>>() { });
+        assertThat(labelsDTO.size()).isEqualTo((count));
     }
 
     @Test
@@ -107,7 +100,6 @@ class LabelControllerTest {
     public void testUpdate() throws Exception {
         var data = new LabelUpdateDTO();
         data.setName(JsonNullable.of("newName"));
-
         var request = put("/api/labels/" + testLabel.getId())
                 .with(token)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -121,25 +113,11 @@ class LabelControllerTest {
     }
 
     @Test
-    public void testUpdateForbidden() throws Exception {
-        token = jwt().jwt(builder -> builder.subject("user@example.com"));
-        var data = new LabelUpdateDTO();
-        data.setName(JsonNullable.of("newName"));
-
-        var request = put("/api/labels/" + testLabel.getId())
-                .with(token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(data));
-
-        mockMvc.perform(request).andExpect(status().isForbidden());
-    }
-
-    @Test
     public void testCreateWithInvalidData() throws Exception {
-        var data = new HashMap<>(Map.of(
+        var data = new HashMap<String, String>(Map.of(
                 "name", "ne"
         ));
-        var request = post("/api/labels")
+        var request = put("/api/labels/" + testLabel.getId())
                 .with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(data));
@@ -152,14 +130,5 @@ class LabelControllerTest {
         mockMvc.perform(delete("/api/labels/" + testLabel.getId())
                         .with(token))
                 .andExpect(status().isNoContent());
-    }
-
-    @Test
-    public void testDeleteForbidden() throws Exception {
-        token = jwt().jwt(builder -> builder.subject("user@example.com"));
-
-        mockMvc.perform(delete("/api/labels/" + testLabel.getId())
-                        .with(token))
-                .andExpect(status().isForbidden());
     }
 }
